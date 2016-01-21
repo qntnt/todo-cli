@@ -25,6 +25,7 @@ todo args = do
         "add" -> addTodo options
         "delete" -> deleteTodo options
         "prompt" -> todoPrompt options
+        "help" -> displayInfo
 
 todoPrompt args = do
     listTodo []
@@ -47,7 +48,7 @@ listTodo args = do
     contents <- readFile todoPath
     
     let todoLines = lines contents
-        numberedLines = zipWith (\n line -> show n ++ " - " ++ line) [0..] todoLines
+        numberedLines = zipWith (\n line -> "\t" ++ (show n) ++ " - " ++ line) [0..] todoLines
     
     putStrLn "\nThese are your tasks:"
     putStrLn $ unlines numberedLines
@@ -77,7 +78,6 @@ deleteTodo args = do
     todoContents <- hGetContents todoHandle
     
     let todoTasks = lines todoContents
-        numberedTasks = zipWith (\n line -> show n ++ " - " ++ line) [0..] todoTasks
         number = read $ head args  
 
     if number < (length todoTasks)
@@ -101,6 +101,8 @@ getTodoPath = do
 
 displayInfo = do
     putStrLn "Commands:"
-    putStrLn "\tview"
+    putStrLn "\tlist"
     putStrLn "\tadd <text>"
     putStrLn "\tdelete <task number (Integer)>"
+    putStrLn "\tprompt"
+    putStrLn "\thelp"

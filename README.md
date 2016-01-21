@@ -17,6 +17,7 @@ Then add the `todo` file to your system path.
 * `add <text>`
 * `delete <number>`
 * `prompt`
+* `help`
 
 ```bash
 > todo list
