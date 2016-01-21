@@ -74,7 +74,7 @@ deleteTodo args = do
     homeDir <- getHomeDirectory
     todoPath <- getTodoPath
     todoHandle <- openFile todoPath ReadMode
-    (tempName, tempHandle) <- openTempFile (homeDir ++ "/.") "todoTemp.txt"
+    (tempName, tempHandle) <- openTempFile (homeDir ++ "/.") "todoTemp"
     todoContents <- hGetContents todoHandle
     
     let todoTasks = lines todoContents
@@ -97,7 +97,7 @@ deleteTodo args = do
 
 getTodoPath = do
     homeDir <- getHomeDirectory
-    return $ homeDir ++ "/todo.txt"
+    return $ homeDir ++ "/.todo"
 
 displayInfo = do
     putStrLn "Commands:"

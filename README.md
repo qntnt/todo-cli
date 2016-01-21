@@ -10,7 +10,7 @@ ghc --make todo.hs
 Then add the `todo` file to your system path.
 
 ## Usage
-> The file `todo.txt` will be made in your home directory to store your tasks.
+> The file `.todo` will be made in your home directory to store your tasks.
 
 ### Commands
 * `list`
