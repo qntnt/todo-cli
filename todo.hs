@@ -1,8 +1,8 @@
 import Control.Monad
-import Data.List
 import System.Directory
 import System.Environment
 import System.IO
+import Data.List
 
 main = do
     args <- getArgs
@@ -10,7 +10,7 @@ main = do
     then
         todo args
     else
-        todoPrompt
+        displayInfo
 
             
 --------------------------------------------------------------------------------
@@ -19,16 +19,14 @@ main = do
 todo args = do
     let command = (head args)
         options = (tail args)
-    if command == "list" || command == "add" || command == "delete"
-    then
-        case command of
-            "list" -> listTodo options
-            "add" -> addTodo options
-            "delete" -> deleteTodo options
-    else
-        displayInfo
 
-todoPrompt = do
+    case command of
+        "list" -> listTodo options
+        "add" -> addTodo options
+        "delete" -> deleteTodo options
+        "prompt" -> todoPrompt options
+
+todoPrompt args = do
     listTodo []
     putStrLn "(1) Add Item"
     putStrLn "(2) Delete Item"
@@ -37,12 +35,13 @@ todoPrompt = do
         case read input of
             1 -> addTodoPrompt
             2 -> deleteTodoPrompt
-        todoPrompt
+        todoPrompt args
 
 
 --------------------------------------------------------------------------------
 -- Actions
 
+-- list
 listTodo args = do
     todoPath <- getTodoPath
     contents <- readFile todoPath
@@ -53,6 +52,7 @@ listTodo args = do
     putStrLn "\nThese are your tasks:"
     putStrLn $ unlines numberedLines
 
+-- add
 addTodoPrompt = do
     putStrLn "What do you need to do?"
     taskText <- getLine
@@ -62,14 +62,13 @@ addTodo args = do
     todoPath <- getTodoPath
     let taskText = head args
     appendFile todoPath (taskText ++ "\n")
-    putStr "\n"
 
+-- delete
 deleteTodoPrompt = do
     putStrLn "Which task do you want to delete?"
     numberString <- getLine
     deleteTodo [numberString]
     
-
 deleteTodo args = do
     homeDir <- getHomeDirectory
     todoPath <- getTodoPath
@@ -91,7 +90,6 @@ deleteTodo args = do
     hClose tempHandle
     removeFile todoPath
     renameFile tempName todoPath
-    putStr "\n"
 
 
 --------------------------------------------------------------------------------
