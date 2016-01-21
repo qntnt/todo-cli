@@ -1,23 +1,49 @@
-import System.IO
 import Control.Monad
-import System.Directory
 import Data.List
+import System.Directory
+import System.Environment
+import System.IO
 
 main = do
-    listTodo
+    args <- getArgs
+    if (length args) > 0
+    then
+        todo args
+    else
+        todoPrompt
+
+            
+--------------------------------------------------------------------------------
+-- Command and Prompt
+
+todo args = do
+    let command = (head args)
+        options = (tail args)
+    if command == "list" || command == "add" || command == "delete"
+    then
+        case command of
+            "list" -> listTodo options
+            "add" -> addTodo options
+            "delete" -> deleteTodo options
+    else
+        displayInfo
+
+todoPrompt = do
+    listTodo []
     putStrLn "(1) Add Item"
     putStrLn "(2) Delete Item"
     input <- getLine
     when (input == "1" || input == "2") $ do
         case read input of
-            1 -> addTodo
-            2 -> deleteTodo
-        main
+            1 -> addTodoPrompt
+            2 -> deleteTodoPrompt
+        todoPrompt
+
 
 --------------------------------------------------------------------------------
 -- Actions
 
-listTodo = do
+listTodo args = do
     todoPath <- getTodoPath
     contents <- readFile todoPath
     
@@ -27,15 +53,24 @@ listTodo = do
     putStrLn "\nThese are your tasks:"
     putStrLn $ unlines numberedLines
 
-addTodo = do
-    todoPath <- getTodoPath
+addTodoPrompt = do
     putStrLn "What do you need to do?"
-    todoItem <- getLine
-    
-    appendFile todoPath (todoItem ++ "\n")
+    taskText <- getLine
+    addTodo [taskText]
+
+addTodo args = do
+    todoPath <- getTodoPath
+    let taskText = head args
+    appendFile todoPath (taskText ++ "\n")
     putStr "\n"
 
-deleteTodo = do
+deleteTodoPrompt = do
+    putStrLn "Which task do you want to delete?"
+    numberString <- getLine
+    deleteTodo [numberString]
+    
+
+deleteTodo args = do
     homeDir <- getHomeDirectory
     todoPath <- getTodoPath
     todoHandle <- openFile todoPath ReadMode
@@ -44,11 +79,7 @@ deleteTodo = do
     
     let todoTasks = lines todoContents
         numberedTasks = zipWith (\n line -> show n ++ " - " ++ line) [0..] todoTasks
-    
-    putStrLn "Which task do you want to delete?"
-    numberString <- getLine
-
-    let number = read numberString
+        number = read $ head args  
 
     if number < (length todoTasks)
     then do
@@ -70,3 +101,8 @@ getTodoPath = do
     homeDir <- getHomeDirectory
     return $ homeDir ++ "/todo.txt"
 
+displayInfo = do
+    putStrLn "Commands:"
+    putStrLn "\tview"
+    putStrLn "\tadd <text>"
+    putStrLn "\tdelete <task number (Integer)>"
